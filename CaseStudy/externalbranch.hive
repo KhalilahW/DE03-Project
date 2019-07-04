@@ -1,0 +1,10 @@
+drop table CDW_SAPP_BRANCH;
+drop table CDW_SAPP_D_BRANCH;
+
+create external table CDW_SAPP_BRANCH
+(BRANCH_CODE String, BRANCH_NAME String, BRANCH_STREET String,
+BRANCH_CITY String, BRANCH_STATE String, BRANCH_ZIP String, 
+BRANCH_PHONE String, LAST_UPDATED Timestamp)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+location '/user/maria_dev/Credit_Card_System/CDW_SAPP_BRANCH';

@@ -1,0 +1,55 @@
+sqoop job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop
+--create branchjob
+-- import 
+--connect jdbc:mysql://localhost/cdw_sapp
+--driver com.mysql.jdbc.Driver 
+--query  'SELECT * FROM CDW_SAPP_BRANCH WHERE $CONDITIONS' 
+--fields-terminated-by '\t' 
+--incremental append 
+--check-column branch_code
+--last-value '0' 
+--target-dir /user/maria_dev/Credit_Card_System/CDW_SAPP_BRANCH
+-m1
+
+
+sqoop job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop
+--create creditjob
+-- import 
+--connect jdbc:mysql://localhost/cdw_sapp
+--driver com.mysql.jdbc.Driver 
+--query  'SELECT * FROM CDW_SAPP_CREDITCARD WHERE $CONDITIONS' 
+--fields-terminated-by '\t' 
+--incremental append 
+--check-column transaction_id
+--last-value '0' 
+--target-dir /user/maria_dev/Credit_Card_System/CDW_SAPP_CREDITCARD
+-m1
+
+sqoop job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop
+--create customerjob
+-- import 
+--connect jdbc:mysql://localhost/cdw_sapp
+--driver com.mysql.jdbc.Driver 
+--query  'SELECT * FROM CDW_SAPP_CUSTOMER WHERE $CONDITIONS' 
+--fields-terminated-by '\t' 
+--incremental append 
+--check-column ssn
+--last-value '0' 
+--target-dir /user/maria_dev/Credit_Card_System/CDW_SAPP_CUSTOMER
+-m1
+
+sqoop job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop
+--create timejob
+-- import 
+--connect jdbc:mysql://localhost/cdw_sapp
+--driver com.mysql.jdbc.Driver 
+--query  'SELECT * FROM CDW_SAPP_CREDITCARD WHERE $CONDITIONS' 
+--fields-terminated-by '\t' 
+--incremental append 
+--columns "transaction_id,day,month,year"
+--check-column transaction_id
+--last-value '0' 
+--target-dir /user/maria_dev/Credit_Card_System/CDW_SAPP_TIME
+-m1
+
+

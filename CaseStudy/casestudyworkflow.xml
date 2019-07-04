@@ -1,0 +1,269 @@
+<workflow-app xmlns="uri:oozie:workflow:0.2" name="Case_Study">
+    <start to="sqoop-branch-node"/>   
+                
+        <action name="sqoop-branch-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+            <command>job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop --exec branchjob</command>              
+        
+        <archive>/user/maria_dev/lib/java-json.jar#java-json.jar</archive>
+        </sqoop>
+
+        <ok to="sqoop-credit-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="sqoop-credit-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+            <command>job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop --exec creditjob</command>              
+        
+        <archive>/user/maria_dev/lib/java-json.jar#java-json.jar</archive>
+        </sqoop>
+
+        <ok to="sqoop-customer-node"/>
+        <error to="fail"/>
+    </action>
+
+
+    <action name="sqoop-customer-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+
+            <configuration>
+                 <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+            <command>job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop --exec customerjob</command>              
+        
+        <archive>/user/maria_dev/lib/java-json.jar#java-json.jar</archive>
+        </sqoop>
+
+        <ok to="sqoop-time-node"/>
+        <error to="fail"/>
+    </action>
+
+ <action name="sqoop-time-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+            <command>job --meta-connect jdbc:hsqldb:hsql://localhost:16000/sqoop --exec timejob</command>              
+        
+        <archive>/user/maria_dev/lib/java-json.jar#java-json.jar</archive>
+        </sqoop>
+
+        <ok to="Create_Branch_Table"/>
+        <error to="fail"/>
+    </action>
+
+
+    <action name = "Create_Branch_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/externalbranch.hive</script>
+      </hive>
+        
+      <ok to = "Create_Branch_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Create_Branch_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+        <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/branch.hive</script>
+      </hive>
+        
+      <ok to = "Insert_into_Branch_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Insert_into_Branch_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/Copybranchdata.hql</script>
+        
+      </hive>
+        
+      <ok to = "Create_CreditCard_Table" />
+      <error to = "fail" />
+   </action>
+
+
+    <action name = "Create_CreditCard_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/externalcreditcard.hive</script>
+      </hive>
+        
+      <ok to = "Create_CreditCard_F_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Create_CreditCard_F_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+        <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/creditcard.hive</script>
+      </hive>
+        
+      <ok to = "Insert_into_CreditCard_F_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Insert_into_CreditCard_F_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/Copycreditcarddata.hql</script>
+        
+      </hive>
+
+      <ok to = "Create_Customer_Table" />
+      <error to = "fail" />
+
+   </action>
+
+
+    <action name = "Create_Customer_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/externalcustomer.hive</script>
+      </hive>
+        
+      <ok to = "Create_Customer_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Create_Customer_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+        <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/customer.hive</script>
+      </hive>
+        
+      <ok to = "Insert_into_Customer_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Insert_into_Customer_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/Copycustomerdata.hql</script>
+        
+      </hive>
+
+      <ok to = "Create_Time_Table" />
+      <error to = "fail" />
+
+
+   </action>
+
+   <action name = "Create_Time_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/externaltime.hive</script>
+      </hive>
+        
+      <ok to = "Create_Time_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Create_Time_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+        <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/time.hive</script>
+      </hive>
+        
+      <ok to = "Insert_into_Time_D_Table" />
+      <error to = "fail" />
+   </action>
+   
+   <action name = "Insert_into_Time_D_Table">
+      <hive xmlns = "uri:oozie:hive-action:0.4">
+         <job-tracker>${jobTracker}</job-tracker>
+         <name-node>${nameNode}</name-node>
+
+         <script>${nameNode}/user/maria_dev/oozie_casestudy/Copytimedata.hql</script>
+        
+      </hive>
+      
+      <ok to = "end" />
+      <error to = "fail" />
+   </action>
+   
+   <kill name = "fail">
+      <message>Job failed</message>
+   </kill>
+    
+   <end name = "end" />
+</workflow-app>

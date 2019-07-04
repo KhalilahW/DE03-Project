@@ -1,10 +1,10 @@
 The first step is to log into SQL from the command line using: mysql -u root -p. 
-You'll be prompted to enter the password (it's usually "password")
-From the MySQL command line give the command to change to the database you want to use: use cdw_sapp;.
+You'll be prompted to enter the password (it's usually "password").
+From the MySQL command line give the command to change to the database you want to use: use cdw_sapp; .
 If your database exists, you'll get a message that reads: database changed.
 Now give the command to grant all privileges to your database of choice:  grant all privileges on cdw_sapp.* to ''@'localhost';.
 If successful, you'll see this message: Query OK, 0 rows affected (0.02 sec).
-Exit from SQL using Ctr+C
+Exit from SQL using Ctr+C.
 
 Open a new tab for your Virtual Machine and enter this command to start the Sqoop Metastore: sqoop-metastore.
 
